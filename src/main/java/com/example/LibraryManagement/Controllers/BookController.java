@@ -11,7 +11,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("api/v1")
-public class UserController {
+public class BookController {
     @Autowired
     BookService bookService;
     //Petición GET de prueba
