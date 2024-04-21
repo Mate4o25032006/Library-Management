@@ -28,7 +28,7 @@ public class User{
 
     //Cada vez que consulto a un usuario, traigo todos sus roles.
     //Borro un usuario y se borra toda su info
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user_roles",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id"))

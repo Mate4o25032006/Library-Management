@@ -104,4 +104,18 @@ public class BookService{
         }
     }
 
+    //Delete Book
+    public Book deleteBook(Long idBook) {
+        try {
+            Optional<Book> deletedBook = bookRepository.findById(idBook);
+            if (deletedBook.isEmpty()) {
+                throw new BookNoFoundException("Book with id " + idBook + " no found");
+            }
+            bookRepository.delete(deletedBook.get());
+        } catch (Exception e) {
+            throw new DatabaseException("Error deleting the book with id " + idBook);
+        }
+        return null;
+    }
+
 }
