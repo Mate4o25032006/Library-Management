@@ -6,6 +6,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 @Entity
+@Getter @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "books")
 public class Book {
     @Id
@@ -19,26 +22,19 @@ public class Book {
     @Column(nullable = false, length = 80)
     private String description;
 
-    @Column(nullable = false, length = 20)
-    private String author;
-
     @Column(nullable = false, length = 10)
     private long numPages;
 
-    @Column(nullable = false)
-    private boolean availability;
 
-    public Book() {
-    }
+    //Relación M:1 con Author
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "author_id", nullable = false)
+    private Author author;
 
-    public Book(long id, String name, String description, String author, long numPages, boolean availability) {
-        Id = id;
-        this.name = name;
-        this.description = description;
-        this.author = author;
-        this.numPages = numPages;
-        this.availability = availability;
-    }
+    //Relación N:1 con la entidad Category
+    @ManyToOne
+    @JoinColumn(name = "category_id", nullable = false)
+    private Category category;
 
     public long getId() {
         return Id;
@@ -64,14 +60,6 @@ public class Book {
         this.description = description;
     }
 
-    public String getAuthor() {
-        return author;
-    }
-
-    public void setAuthor(String author) {
-        this.author = author;
-    }
-
     public long getNumPages() {
         return numPages;
     }
@@ -80,11 +68,20 @@ public class Book {
         this.numPages = numPages;
     }
 
-    public boolean isAvailability() {
-        return availability;
+
+    public Author getAuthor() {
+        return author;
     }
 
-    public void setAvailability(boolean availability) {
-        this.availability = availability;
+    public void setAuthor(Author author) {
+        this.author = author;
+    }
+
+    public Category getCategory() {
+        return category;
+    }
+
+    public void setCategory(Category category) {
+        this.category = category;
     }
 }

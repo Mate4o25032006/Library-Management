@@ -53,13 +53,16 @@ public class SecurityConfig {
                 .sessionManagement() //Allows session management
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
-                .authorizeHttpRequests() //All HTTP request must be authorized
+                .authorizeHttpRequests()
                 .requestMatchers("/api/auth/**").permitAll()
-                .requestMatchers(HttpMethod.POST, "api/v1/books").hasAuthority("ADMIN")
-                .requestMatchers(HttpMethod.PUT).hasAuthority("ADMIN")
-                .requestMatchers(HttpMethod.DELETE).hasAuthority("ADMIN")
-                .requestMatchers(HttpMethod.GET).hasAnyAuthority("ADMIN" , "USER")
-                .anyRequest().authenticated()
+                .requestMatchers("/api/test/**").permitAll()
+                .requestMatchers( "/swagger-ui/**", "/swagger-ui.html").permitAll()
+                .requestMatchers(HttpMethod.GET, "api/v1/books").permitAll()
+                .requestMatchers(HttpMethod.POST, "api/v1/books").permitAll()
+                .requestMatchers(HttpMethod.PUT).permitAll()
+                .requestMatchers(HttpMethod.DELETE).permitAll()
+                //.requestMatchers(HttpMethod.GET).hasAnyAuthority("ADMIN" , "USER")
+                .anyRequest().permitAll() //All HTTP request must be authorized
                 .and()
                 .httpBasic();
         http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);

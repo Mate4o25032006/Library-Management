@@ -1,11 +1,14 @@
 package com.example.LibraryManagement.Services;
 
-import com.example.LibraryManagement.Exceptions.BookExistException;
+import com.example.LibraryManagement.DTOS.DtoBook;
 import com.example.LibraryManagement.Exceptions.BookNoFoundException;
-import com.example.LibraryManagement.Exceptions.BooksNotAvailability;
 import com.example.LibraryManagement.Exceptions.DatabaseException;
+import com.example.LibraryManagement.Models.Author;
 import com.example.LibraryManagement.Models.Book;
+import com.example.LibraryManagement.Models.Category;
+import com.example.LibraryManagement.Repositories.AuthorRepository;
 import com.example.LibraryManagement.Repositories.BookRepository;
+import com.example.LibraryManagement.Repositories.CategoryRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -18,8 +21,13 @@ import java.util.Optional;
 @Service
 public class BookService{
     private final BookRepository bookRepository;
-    public BookService(BookRepository bookRepository) {
+    private final AuthorRepository authorRepository;
+    private final CategoryRepository categoryRepository;
+
+    public BookService(BookRepository bookRepository, AuthorRepository authorRepository, CategoryRepository categoryRepository) {
         this.bookRepository = bookRepository;
+        this.authorRepository = authorRepository;
+        this.categoryRepository = categoryRepository;
     }
 
     //Get all Books (Public)
@@ -37,7 +45,7 @@ public class BookService{
             Optional<Book> book = bookRepository.findById(idBook);
             if(book.isEmpty()){
                 throw new BookNoFoundException("Book with ID " + idBook + " not found.");
-            }
+            }   
             return book;
         }catch (Exception e){
             throw new DatabaseException("Error when querying database.");
@@ -59,50 +67,42 @@ public class BookService{
     }
 
 
-    //Get Book By availability (Public)
-    public List<Book> getBooksByAvailability(String availability){
-        try{
-            Boolean bool = Boolean.parseBoolean(availability);
-            List<Book> books = bookRepository.findByAvailability(bool);
-            if(books.isEmpty()){
-                throw new BooksNotAvailability("There's not Books availability");
-            }else{
-                return books;
-            }
-        }catch(Exception e){
-            throw new DatabaseException("Error when querying database.");
-        }
-    }
-
-
     //Register Book (Private)
     @Transactional
-    public ResponseEntity<String> registerBook(@RequestBody Book book){
-        try{
-            Optional<Book> validBook = bookRepository.findById(book.getId());
-            if(validBook.isPresent()){
-                throw new BookExistException("Book already exists in the database.");
-            }else{
-                bookRepository.save(book);
-            }
-            return new ResponseEntity<>("correctly registered book", HttpStatus.CREATED);
-        }catch (Exception e){
-            throw new DatabaseException("An error has occurred in the registration");
+    public ResponseEntity<String> registerBook(@RequestBody DtoBook dtoBook) {
+
+        // Validar que authorId y categoryId no sean nulos antes de continuar
+        /*if (dtoBook.getAuthorId() == null || dtoBook.getCategoryId() == null) {
+            return new ResponseEntity<>("Author ID and Category ID must not be null", HttpStatus.BAD_REQUEST);
+        }*/
+
+        try {
+            Author author = authorRepository.findById(dtoBook.getAuthorId())
+                    .orElseThrow(() -> new DatabaseException("Author not found"));
+
+            Category category = categoryRepository.findById(dtoBook.getCategoryId())
+                    .orElseThrow(() -> new DatabaseException("Category not found"));
+
+            Book book = new Book();
+            book.setName(dtoBook.getName());
+            book.setDescription(dtoBook.getDescription());
+            book.setNumPages(dtoBook.getNumPages());
+            book.setAuthor(author);
+            book.setCategory(category);
+
+            bookRepository.save(book);
+            return new ResponseEntity<>("Book registered correctly", HttpStatus.CREATED);
+
+        } catch (DatabaseException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>("An error occurred: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
 
-    //Update Book state (Private)
-    public Book updateBook(Long idBook) {
-        Optional<Book> foundBook = bookRepository.findById(idBook);
-        if(foundBook.isEmpty()){
-            throw new BookNoFoundException("Book with ID " + idBook + " not found.");
-        } else {
-            Book book = foundBook.get();
-            book.setAvailability(false);
-            return bookRepository.save(book);
-        }
-    }
 
     //Delete Book
     public Book deleteBook(Long idBook) {

@@ -9,7 +9,5 @@ import java.util.Optional;
 
 @Repository
 public interface BookRepository extends JpaRepository<Book, Long> {
-    public List<Book> findByAvailability(Boolean availability);
     public List<Book> findByNameContaining(String name);
-
 }

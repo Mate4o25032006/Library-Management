@@ -1,5 +1,6 @@
 package com.example.LibraryManagement.Controllers;
 
+import com.example.LibraryManagement.DTOS.DtoBook;
 import com.example.LibraryManagement.Models.Book;
 import com.example.LibraryManagement.Services.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,8 +10,9 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
 
+@CrossOrigin(origins = "http://localhost:5173")
 @RestController
-@RequestMapping("api/v1")
+@RequestMapping("/api/v1")
 public class BookController {
     @Autowired
     BookService bookService;
@@ -30,10 +32,6 @@ public class BookController {
         return bookService.getBookById(idBook);
     }
 
-    @GetMapping("/books/available/{availability}")
-    public List<Book> getBooksByAvailability(@PathVariable("availability") String availability){
-        return bookService.getBooksByAvailability(availability);
-    }
 
     @GetMapping("/books/search/{name}")
     public List<Book> getBookByName(@PathVariable("name") String name){
@@ -41,14 +39,10 @@ public class BookController {
     }
 
     @PostMapping("/books")
-    public ResponseEntity<String> registerBook(@RequestBody Book book){
-        return bookService.registerBook(book);
+    public ResponseEntity<String> registerBook(@RequestBody DtoBook dtoBook){
+        return bookService.registerBook(dtoBook);
     }
 
-    @PutMapping("/books/{idBook}")
-    public Book updateBook(@PathVariable Long idBook){
-        return bookService.updateBook(idBook);
-    }
 
     @DeleteMapping("/books/{idBook}")
     public Book deleteBook(@PathVariable Long idBook){

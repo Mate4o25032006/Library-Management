@@ -30,9 +30,9 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     //Método para traer usuario (Con todos sus datos) por medio de su 'username'
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByUserName(username).orElseThrow(() -> new UsernameNotFoundException("User with UserName " + username + " Not Found"));
-        return new org.springframework.security.core.userdetails.User(user.getUserName(), user.getPassword(), mapToAuthorities(user.getRoles()));
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("User with email " + email + " Not Found"));
+        return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(), mapToAuthorities(user.getRoles()));
     }
 
 }

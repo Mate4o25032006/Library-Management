@@ -3,6 +3,8 @@ package com.example.LibraryManagement.Services;
 import com.example.LibraryManagement.DTOS.DtoAuthResponse;
 import com.example.LibraryManagement.DTOS.DtoLogin;
 import com.example.LibraryManagement.DTOS.DtoRegister;
+import com.example.LibraryManagement.Exceptions.DatabaseException;
+import com.example.LibraryManagement.Models.Book;
 import com.example.LibraryManagement.Models.Role;
 import com.example.LibraryManagement.Models.User;
 import com.example.LibraryManagement.Repositories.RoleRepository;
@@ -20,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.Collections;
+import java.util.List;
 
 @Service
 public class UserService {
@@ -38,13 +41,24 @@ public class UserService {
         this.jwtGenerator = jwtGenerator;
     }
 
+    //Get all Books (Public)
+    public List<User> getAllUsers(){
+        try{
+            return userRepository.findAll();
+        } catch(Exception e){
+            throw new DatabaseException("Error when querying database.");
+        }
+    }
+
     //Register User Method
     public ResponseEntity<String> registerUser(@RequestBody DtoRegister dtoRegister){
-        if(userRepository.existsByUserName(dtoRegister.getUserName())){
+        if(userRepository.existsByEmail(dtoRegister.getEmail())){
             return new ResponseEntity<>("The user already exists, try again", HttpStatus.BAD_REQUEST);
         }
         User user = new User();
+
         user.setUserName(dtoRegister.getUserName());
+        user.setEmail(dtoRegister.getEmail());
         user.setPassword(passwordEncoder.encode(dtoRegister.getPassword()));
 
         Role role = roleRepository.findByName("USER").get();
@@ -54,26 +68,10 @@ public class UserService {
         return new ResponseEntity<>("User Register Correctly", HttpStatus.OK);
     }
 
-    //Register Admin Method
-    public ResponseEntity<String> registerAdm(@RequestBody DtoRegister dtoRegister){
-        if(userRepository.existsByUserName(dtoRegister.getUserName())){
-            return new ResponseEntity<>("The user already exists, try again", HttpStatus.BAD_REQUEST);
-        }
-        User user = new User();
-        user.setUserName(dtoRegister.getUserName());
-        user.setPassword(passwordEncoder.encode(dtoRegister.getPassword()));
-
-        Role role = roleRepository.findByName("ADMIN").get();
-        user.setRoles(Collections.singletonList(role));
-        userRepository.save(user);
-
-        return new ResponseEntity<>("Admin Register Correctly", HttpStatus.OK);
-    }
-
     //Login User Method
     public ResponseEntity<DtoAuthResponse> loginUser(@RequestBody DtoLogin dtoLogin){
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
-                dtoLogin.getUserName(),dtoLogin.getPassword()));
+                dtoLogin.getEmail(),dtoLogin.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         String token = jwtGenerator.generateToken(authentication);

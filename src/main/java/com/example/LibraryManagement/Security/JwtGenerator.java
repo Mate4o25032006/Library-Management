@@ -13,13 +13,13 @@ import java.util.Date;
 public class JwtGenerator {
     //Creating Token
     public String generateToken(Authentication authentication){
-        String username = authentication.getName();
+        String email = authentication.getName();
         Date actualTime = new Date();
         Date tokenExpiration = new Date(actualTime.getTime() + SecurityConstans.JWT_EXPIRATION_TOKEN);
 
         //Token generator
         String token = Jwts.builder() //Building token called "token"
-                .setSubject(username)//User logging in
+                .setSubject(email)//User logging in
                 //Token Issuance and expiry
                 .setIssuedAt(new Date())
                 .setExpiration(tokenExpiration)
