@@ -4,10 +4,7 @@ import com.example.LibraryManagement.DTOS.DtoAuthResponse;
 import com.example.LibraryManagement.DTOS.DtoLogin;
 import com.example.LibraryManagement.DTOS.DtoRegister;
 import com.example.LibraryManagement.Exceptions.DatabaseException;
-import com.example.LibraryManagement.Models.Book;
-import com.example.LibraryManagement.Models.Role;
 import com.example.LibraryManagement.Models.User;
-import com.example.LibraryManagement.Repositories.RoleRepository;
 import com.example.LibraryManagement.Repositories.UserRepository;
 import com.example.LibraryManagement.Security.JwtGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,22 +18,19 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import java.util.Collections;
 import java.util.List;
 
 @Service
 public class UserService {
-    private AuthenticationManager authenticationManager;
-    private PasswordEncoder passwordEncoder;
-    private RoleRepository roleRepository;
-    private UserRepository userRepository;
-    private JwtGenerator jwtGenerator;
+    private final AuthenticationManager authenticationManager;
+    private final PasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
+    private final JwtGenerator jwtGenerator;
 
     @Autowired
-    public UserService(AuthenticationManager authenticationManager, PasswordEncoder passwordEncoder, RoleRepository roleRepository, UserRepository userRepository, JwtGenerator jwtGenerator) {
+    public UserService(AuthenticationManager authenticationManager, PasswordEncoder passwordEncoder, UserRepository userRepository, JwtGenerator jwtGenerator) {
         this.authenticationManager = authenticationManager;
         this.passwordEncoder = passwordEncoder;
-        this.roleRepository = roleRepository;
         this.userRepository = userRepository;
         this.jwtGenerator = jwtGenerator;
     }
@@ -46,7 +40,7 @@ public class UserService {
         try{
             return userRepository.findAll();
         } catch(Exception e){
-            throw new DatabaseException("Error when querying database.");
+            throw new DatabaseException("Error when querying database.", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -61,8 +55,6 @@ public class UserService {
         user.setEmail(dtoRegister.getEmail());
         user.setPassword(passwordEncoder.encode(dtoRegister.getPassword()));
 
-        Role role = roleRepository.findByName("USER").get();
-        user.setRoles(Collections.singletonList(role));
         userRepository.save(user);
 
         return new ResponseEntity<>("User Register Correctly", HttpStatus.OK);

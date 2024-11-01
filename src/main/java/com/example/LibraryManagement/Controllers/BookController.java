@@ -4,6 +4,7 @@ import com.example.LibraryManagement.DTOS.DtoBook;
 import com.example.LibraryManagement.Models.Book;
 import com.example.LibraryManagement.Services.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,9 +24,11 @@ public class BookController {
     }
 
     @GetMapping("/books")
-    public List<Book> getAllBooks(){
-        return bookService.getAllBooks();
+    public ResponseEntity<List<DtoBook>> getUserBooks() {
+        List<DtoBook> userBooks = bookService.getUserBooks();
+        return new ResponseEntity<>(userBooks, HttpStatus.OK);
     }
+
 
     @GetMapping("/books/{idBook}")
     public Optional<Book> getBookById(@PathVariable("idBook") long idBook){
@@ -37,6 +40,7 @@ public class BookController {
     public List<Book> getBookByName(@PathVariable("name") String name){
         return bookService.getBookByName(name);
     }
+
 
     @PostMapping("/books")
     public ResponseEntity<String> registerBook(@RequestBody DtoBook dtoBook){

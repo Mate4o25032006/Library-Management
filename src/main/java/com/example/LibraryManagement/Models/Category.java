@@ -26,6 +26,11 @@ public class Category {
     @OneToMany(mappedBy = "category")
     private List<Book> books;
 
+    //Relación M:1 con USER
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
+
     public Long getIdCategory() {
         return idCategory;
     }
@@ -48,5 +53,13 @@ public class Category {
 
     public void setBooks(List<Book> books) {
         this.books = books;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 }

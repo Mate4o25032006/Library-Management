@@ -1,6 +1,5 @@
 package com.example.LibraryManagement.Security;
 
-import com.example.LibraryManagement.Models.Role;
 import com.example.LibraryManagement.Models.User;
 import com.example.LibraryManagement.Repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,16 +22,15 @@ public class CustomUserDetailsService implements UserDetailsService {
         this.userRepository = userRepository;
     }
 
-    //Método para traer lista de autoridades por medio de lista de Roles
-    public Collection<GrantedAuthority> mapToAuthorities(List<Role> roles){
-        return roles.stream().map(role -> new SimpleGrantedAuthority(role.getName())).collect(Collectors.toList());
-    }
 
     //Método para traer usuario (Con todos sus datos) por medio de su 'username'
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         User user = userRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("User with email " + email + " Not Found"));
-        return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(), mapToAuthorities(user.getRoles()));
+        return new org.springframework.security.core.userdetails.User(
+                user.getEmail(),
+                user.getPassword(),
+                List.of());
     }
 
 }

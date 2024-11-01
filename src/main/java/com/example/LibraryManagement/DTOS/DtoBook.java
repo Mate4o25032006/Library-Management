@@ -7,9 +7,21 @@ import lombok.Data;
 public class DtoBook {
     private String name;
     private String description;
-    private long numPages;
+    private Long numPages;
     private Long authorId;
+    private DtoAuthor author;
     private Long categoryId;
+    private DtoCategory category;
+
+    public DtoBook(String name, String description, long numPages, Long authorId, DtoAuthor author, Long categoryId, DtoCategory category) {
+        this.name = name;
+        this.description = description;
+        this.numPages = numPages;
+        this.authorId = authorId;
+        this.author = author;
+        this.categoryId = categoryId;
+        this.category = category;
+    }
 
     public String getName() {
         return name;
@@ -43,11 +55,27 @@ public class DtoBook {
         this.authorId = authorId;
     }
 
+    public DtoAuthor getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(DtoAuthor author) {
+        this.author = author;
+    }
+
     public Long getCategoryId() {
         return categoryId;
     }
 
     public void setCategoryId(Long categoryId) {
         this.categoryId = categoryId;
+    }
+
+    public DtoCategory getCategory() {
+        return category;
+    }
+
+    public void setCategory(DtoCategory category) {
+        this.category = category;
     }
 }
